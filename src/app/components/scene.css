@@ -55,7 +55,7 @@
   letter-spacing: 0.08em;
 }
 
-@media (max-width: 768px) {
+@media (max-width: 768px), (max-height: 768px) {
   .matrix-cards {
     flex-direction: column;
     gap: 20px;
@@ -65,7 +65,13 @@
 
 @media (max-width: 768px) {
   .matrix-card {
-    height:200px;
+    height: 200px;
+  }
+}
+
+@media (max-height: 800px) {
+  .matrix-card {
+    height: 150px;
   }
 }
 
