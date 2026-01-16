@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
-import { fetchBlogPostById, type BlogPost } from './blogData';
+import { fetchBlogPostById, type BlogPost } from '../services/blogData';
+import TagList from '../components/ui/TagList';
 
 type LoadState = 'idle' | 'loading' | 'ready' | 'error';
 
@@ -99,18 +100,7 @@ export default function BlogPostPage() {
               <p className="text-lg text-muted-foreground leading-relaxed">
                 {post.excerpt}
               </p>
-              {post.tags.length > 0 && (
-                <div className="flex flex-wrap gap-2">
-                  {post.tags.map((tag) => (
-                    <span
-                      key={tag}
-                      className="rounded-full border border-border px-3 py-1 text-xs text-muted-foreground"
-                    >
-                      {tag}
-                    </span>
-                  ))}
-                </div>
-              )}
+              <TagList items={post.tags} />
             </header>
 
             {post.coverImage && (

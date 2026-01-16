@@ -15,10 +15,25 @@ type SceneStyle = React.CSSProperties & {
   ['--travel-end']?: string;
 };
 
-const CARD_LABELS = ['The Architect', 'Residual Self-Images', 'Broadcast'];
+type CardProps = {
+  label: string;
+  route: string;
+}
 
-function MatrixCard({ label }: { label: string }) {
-  return <div className="matrix-card">{label}</div>;
+const CARDS : CardProps[] = [
+  { label: 'The Architect', route: '/architect' },
+  { label: 'Residual Self-Images', route: '/portfolio' },
+  { label: 'Broadcast', route: '/blog' },
+];
+
+function MatrixCard({ label, route }: { label: string; route: string }) {
+  return (
+    <a href={route} className="matrix-card">
+       <div>
+         <span>{label}</span>    
+        </div>
+    </a>
+  );
 }
 
 export default function MatrixConstructScene() {
@@ -62,8 +77,8 @@ export default function MatrixConstructScene() {
       </div>
       {showCards && (
         <div className="matrix-cards">
-          {CARD_LABELS.map(label => (
-            <MatrixCard key={label} label={label} />
+          {CARDS.map(card => (
+            <MatrixCard key={card.label} label={card.label} route={card.route} />
           ))}
         </div>
       )}

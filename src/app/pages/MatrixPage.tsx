@@ -1,17 +1,18 @@
 import { useEffect, useMemo, useState } from 'react';
-import ReactQuill from 'react-quill';
-import 'react-quill/dist/quill.snow.css';
 import {
   createMatrixPost,
   fetchMatrixPosts,
   publishMatrixPost,
   updateMatrixPost,
   type MatrixPost,
-} from './matrixData';
+} from '../services/matrixData';
 import { getSupabaseClient } from '../lib/supabaseClient';
-
-type LoadState = 'idle' | 'loading' | 'ready' | 'error';
-type MatrixTab = 'posts' | 'portfolio';
+import MatrixHeader from '../components/matrix/MatrixHeader';
+import MatrixPostEditor from '../components/matrix/MatrixPostEditor';
+import MatrixPostsList from '../components/matrix/MatrixPostsList';
+import MatrixPublishModal from '../components/matrix/MatrixPublishModal';
+import MatrixTabs from '../components/matrix/MatrixTabs';
+import type { LoadState, MatrixTab } from '../components/matrix/matrixTypes';
 
 export default function MatrixPage() {
   const [loadState, setLoadState] = useState<LoadState>('idle');
@@ -297,55 +298,13 @@ export default function MatrixPage() {
   return (
     <main className="min-h-screen pt-28 pb-16 px-6">
       <div className="max-w-6xl mx-auto space-y-6">
-        <header className="space-y-3">
-          <div className="flex flex-wrap items-center justify-between gap-3">
-            <div className="space-y-2">
-              <p className="text-sm uppercase tracking-[0.2em] text-muted-foreground">
-                Matrix
-              </p>
-              <h1 className="text-3xl">Authoring Console</h1>
-            </div>
-            <button
-              type="button"
-              className="rounded-full border border-border px-4 py-2 text-sm text-muted-foreground"
-              onClick={handleSignOut}
-              disabled={isSigningOut}
-            >
-              {isSigningOut ? 'Signing out...' : 'Log out'}
-            </button>
-          </div>
-          <p className="text-muted-foreground">
-            Draft posts, approve releases, and manage assets with gated access.
-          </p>
-          {signOutError && (
-            <p className="text-sm text-destructive">{signOutError}</p>
-          )}
-        </header>
+        <MatrixHeader
+          onSignOut={handleSignOut}
+          isSigningOut={isSigningOut}
+          signOutError={signOutError}
+        />
 
-        <div className="flex flex-wrap gap-3">
-          <button
-            type="button"
-            className={`rounded-full border px-4 py-2 text-sm ${
-              activeTab === 'posts'
-                ? 'border-primary text-primary'
-                : 'border-border text-muted-foreground'
-            }`}
-            onClick={() => setActiveTab('posts')}
-          >
-            Blog posts
-          </button>
-          <button
-            type="button"
-            className={`rounded-full border px-4 py-2 text-sm ${
-              activeTab === 'portfolio'
-                ? 'border-primary text-primary'
-                : 'border-border text-muted-foreground'
-            }`}
-            onClick={() => setActiveTab('portfolio')}
-          >
-            Portfolio items
-          </button>
-        </div>
+        <MatrixTabs activeTab={activeTab} onChange={setActiveTab} />
 
         {activeTab === 'portfolio' && (
           <section className="rounded-lg border border-border bg-card p-6 text-sm text-muted-foreground">
@@ -356,280 +315,51 @@ export default function MatrixPage() {
 
         {activeTab === 'posts' && (
           <div className="grid gap-6 lg:grid-cols-[320px_1fr]">
-            <section className="rounded-lg border border-border bg-card p-4">
-              <div className="flex items-center justify-between">
-                <h2 className="text-lg">Posts</h2>
-                <button
-                  type="button"
-                  className="text-sm text-primary"
-                  aria-label="Create new draft post"
-                  onClick={handleStartNewDraft}
-                  disabled={isCreating || isSaving}
-                >
-                  New draft
-                </button>
-              </div>
-              <div className="mt-4 space-y-3">
-                <div className="flex items-center justify-between text-xs uppercase tracking-[0.2em] text-muted-foreground">
-                  <span>Title</span>
-                  <span>Status</span>
-                </div>
-                {loadState === 'loading' && (
-                  <p className="text-sm text-muted-foreground">
-                    Loading posts...
-                  </p>
-                )}
-                {loadState === 'error' && (
-                  <p className="text-sm text-destructive">
-                    {loadError ?? 'Unable to load posts.'}
-                  </p>
-                )}
-                {loadState === 'ready' && posts.length === 0 && (
-                  <div className="rounded-lg border border-dashed border-border p-4 text-sm text-muted-foreground">
-                    <p>No posts yet. Create your first draft to get started.</p>
-                  </div>
-                )}
-                {posts.map((post) => {
-                  const missingFields = getMissingFields(post);
+            <MatrixPostsList
+              posts={posts}
+              loadState={loadState}
+              loadError={loadError}
+              selectedPostId={selectedPostId}
+              onSelectPost={setSelectedPostId}
+              onCreateNew={handleStartNewDraft}
+              isCreateDisabled={isCreating || isSaving}
+              getMissingFields={getMissingFields}
+            />
 
-                  return (
-                    <button
-                      key={post.id}
-                      type="button"
-                      onClick={() => setSelectedPostId(post.id)}
-                      className={`w-full rounded-lg border px-4 py-3 text-left text-sm ${
-                        post.id === selectedPostId
-                          ? 'border-primary text-primary'
-                          : 'border-border text-muted-foreground'
-                      }`}
-                    >
-                      <div className="flex items-center justify-between">
-                        <span className="font-medium text-foreground">
-                          {post.title}
-                        </span>
-                        <span className="text-xs uppercase tracking-[0.2em]">
-                          {post.status}
-                        </span>
-                      </div>
-                      <p className="mt-2 text-xs text-muted-foreground">
-                        Updated {post.updatedAt}
-                      </p>
-                      {missingFields.length > 0 && (
-                        <p className="mt-2 text-xs text-destructive">
-                          Missing {missingFields.join(', ')}
-                        </p>
-                      )}
-                    </button>
-                  );
-                })}
-              </div>
-            </section>
-
-            <section className="rounded-lg border border-border bg-card p-6">
-              {!selectedPost && !isCreatingNew && (
-                <div className="space-y-2 text-sm text-muted-foreground">
-                  <p>Select a post to view or edit content.</p>
-                  <p>
-                    Required fields: title, excerpt, content, and tags before
-                    saving or approving.
-                  </p>
-                </div>
-              )}
-              {(selectedPost || isCreatingNew) && (
-                <div className="space-y-6">
-                  <div className="flex flex-wrap items-center justify-between gap-3">
-                    <div>
-                      <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">
-                        {isCreatingNew
-                          ? 'New draft'
-                          : selectedPost.status === 'published'
-                          ? 'Published'
-                          : 'Draft'}
-                      </p>
-                      <h2 className="text-2xl">
-                        {isCreatingNew
-                          ? 'New draft'
-                          : selectedPost.title}
-                      </h2>
-                      {isEditingLocked && (
-                        <p className="mt-2 text-xs text-muted-foreground">
-                          Published posts are locked and cannot be edited.
-                        </p>
-                      )}
-                    </div>
-                    <button
-                      type="button"
-                      className="rounded-full border border-border px-4 py-2 text-sm text-muted-foreground"
-                      onClick={() => setIsPublishModalOpen(true)}
-                      disabled={
-                        isEditingLocked ||
-                        isCreatingNew ||
-                        isPublishing ||
-                        !validation.isValid
-                      }
-                    >
-                      {isEditingLocked
-                        ? 'Published'
-                        : isPublishing
-                        ? 'Publishing...'
-                        : 'Approve post'}
-                    </button>
-                  </div>
-
-                <div className="space-y-3">
-                  <label className="text-sm font-medium">Title</label>
-                    <input
-                      type="text"
-                      value={draftTitle}
-                      onChange={(event) => setDraftTitle(event.target.value)}
-                      className="w-full rounded-lg border border-border bg-transparent px-4 py-3 text-sm"
-                      disabled={isEditingLocked}
-                    />
-                  {showValidation && validation.errors.title && (
-                    <p className="text-sm text-destructive">
-                      {validation.errors.title}
-                    </p>
-                  )}
-                </div>
-
-                <div className="space-y-3">
-                  <label className="text-sm font-medium">Excerpt</label>
-                  <textarea
-                    value={draftExcerpt}
-                    onChange={(event) => setDraftExcerpt(event.target.value)}
-                    className="min-h-[120px] w-full rounded-lg border border-border bg-transparent px-4 py-3 text-sm"
-                    disabled={isEditingLocked}
-                  />
-                  {showValidation && validation.errors.excerpt && (
-                    <p className="text-sm text-destructive">
-                      {validation.errors.excerpt}
-                    </p>
-                  )}
-                </div>
-
-                <div className="space-y-3">
-                  <label className="text-sm font-medium">Content</label>
-                  <ReactQuill
-                    theme="snow"
-                    value={draftContent}
-                    onChange={setDraftContent}
-                    readOnly={isEditingLocked}
-                    className="rounded-lg border border-border bg-transparent text-sm"
-                  />
-                  {showValidation && validation.errors.content && (
-                    <p className="text-sm text-destructive">
-                      {validation.errors.content}
-                    </p>
-                  )}
-                  <p className="text-xs text-muted-foreground">
-                    Rich text editor supports image embeds for JPG and GIF.
-                  </p>
-                </div>
-
-                <div className="space-y-3">
-                  <label className="text-sm font-medium">Tags</label>
-                  <input
-                    type="text"
-                    value={draftTagsInput}
-                    onChange={(event) => setDraftTagsInput(event.target.value)}
-                    className="w-full rounded-lg border border-border bg-transparent px-4 py-3 text-sm"
-                    disabled={isEditingLocked}
-                    placeholder="Security, Infrastructure, Systems"
-                  />
-                  {showValidation && validation.errors.tags && (
-                    <p className="text-sm text-destructive">
-                      {validation.errors.tags}
-                    </p>
-                  )}
-                  <p className="text-xs text-muted-foreground">
-                    Separate tags with commas.
-                  </p>
-                </div>
-
-                  {!isEditingLocked && (
-                    <div className="flex flex-wrap gap-3">
-                      <button
-                        type="button"
-                        className="rounded-full border border-border px-4 py-2 text-sm text-muted-foreground"
-                      >
-                        Upload media
-                      </button>
-                      <button
-                        type="button"
-                        className="rounded-full border border-border px-4 py-2 text-sm text-muted-foreground"
-                        onClick={
-                          isCreatingNew ? handleCreateDraft : handleSaveDraft
-                        }
-                        disabled={
-                          isSaving ||
-                          isCreating ||
-                          !validation.isValid
-                        }
-                      >
-                        {isCreatingNew
-                          ? isCreating
-                            ? 'Creating...'
-                            : 'Create draft'
-                          : isSaving
-                          ? 'Saving...'
-                          : 'Save draft'}
-                      </button>
-                      <button
-                        type="button"
-                        className="rounded-full border border-border px-4 py-2 text-sm text-destructive"
-                        disabled={isCreatingNew}
-                      >
-                        Delete
-                      </button>
-                    </div>
-                  )}
-                  {(saveError || createError) && (
-                    <p className="text-sm text-destructive">
-                      {saveError ?? createError}
-                    </p>
-                  )}
-                  {publishError && (
-                    <p className="text-sm text-destructive">{publishError}</p>
-                  )}
-                </div>
-              )}
-            </section>
+            <MatrixPostEditor
+              selectedPost={selectedPost}
+              isCreatingNew={isCreatingNew}
+              isEditingLocked={isEditingLocked}
+              draftTitle={draftTitle}
+              draftExcerpt={draftExcerpt}
+              draftContent={draftContent}
+              draftTagsInput={draftTagsInput}
+              onTitleChange={setDraftTitle}
+              onExcerptChange={setDraftExcerpt}
+              onContentChange={setDraftContent}
+              onTagsChange={setDraftTagsInput}
+              showValidation={showValidation}
+              validation={validation}
+              onOpenPublishModal={() => setIsPublishModalOpen(true)}
+              isPublishing={isPublishing}
+              isSaving={isSaving}
+              isCreating={isCreating}
+              onSave={isCreatingNew ? handleCreateDraft : handleSaveDraft}
+              saveError={saveError}
+              createError={createError}
+              publishError={publishError}
+            />
           </div>
         )}
       </div>
 
-      {isPublishModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/80 px-6 py-8">
-          <div className="w-full max-w-md rounded-lg border border-border bg-card p-6 shadow-xl">
-            <h3 className="text-lg">Publish this post?</h3>
-            <p className="mt-2 text-sm text-muted-foreground">
-              Publishing is one-way. This will lock editing and set the
-              published date.
-            </p>
-            {publishError && (
-              <p className="mt-4 text-sm text-destructive">{publishError}</p>
-            )}
-            <div className="mt-6 flex flex-wrap justify-end gap-3">
-              <button
-                type="button"
-                className="rounded-full border border-border px-4 py-2 text-sm text-muted-foreground"
-                onClick={() => setIsPublishModalOpen(false)}
-                disabled={isPublishing}
-              >
-                Cancel
-              </button>
-              <button
-                type="button"
-                className="rounded-full border border-border px-4 py-2 text-sm text-destructive"
-                onClick={handlePublishDraft}
-                disabled={isPublishing}
-              >
-                {isPublishing ? 'Publishing...' : 'Publish now'}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      <MatrixPublishModal
+        isOpen={isPublishModalOpen}
+        isPublishing={isPublishing}
+        publishError={publishError}
+        onClose={() => setIsPublishModalOpen(false)}
+        onPublish={handlePublishDraft}
+      />
     </main>
   );
 }

@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { fetchBlogPosts, type BlogPost } from './blogData';
+import { fetchBlogPosts, type BlogPost } from '../services/blogData';
+import TagList from '../components/ui/TagList';
 
 type LoadState = 'idle' | 'loading' | 'ready' | 'error';
 
@@ -29,8 +30,8 @@ export default function BlogPage() {
   }, []);
 
   return (
-    <main className="min-h-screen pt-28 pb-16 px-6">
-      <div className="max-w-4xl mx-auto space-y-8">
+    <main className="h-[100svh] pt-32 pb-10 px-6 md:h-screen md:pt-28 md:pb-16">
+      <div className="max-w-4xl mx-auto flex h-full flex-col gap-8">
         <header className="space-y-2">
           <p className="text-sm uppercase tracking-[0.2em] text-muted-foreground">
             Blog
@@ -40,7 +41,7 @@ export default function BlogPage() {
             Published posts will appear here for public reading.
           </p>
         </header>
-        <section className="space-y-4">
+        <section className="min-h-0 flex-1 space-y-4 overflow-y-auto">
           {loadState === 'loading' && (
             <div className="rounded-lg border border-border bg-card p-6 text-sm text-muted-foreground">
               <div className="flex items-center gap-3">
@@ -64,16 +65,7 @@ export default function BlogPage() {
                 <p className="mt-2 text-sm text-muted-foreground">
                   {post.excerpt}
                 </p>
-                <div className="mt-4 flex flex-wrap gap-2">
-                  {post.tags.map((tag) => (
-                    <span
-                      key={tag}
-                      className="rounded-full border border-border px-3 py-1 text-xs text-muted-foreground"
-                    >
-                      {tag}
-                    </span>
-                  ))}
-                </div>
+                <TagList items={post.tags} className="mt-4" />
               </article>
             </Link>
           ))}

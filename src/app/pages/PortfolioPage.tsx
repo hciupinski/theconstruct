@@ -2,7 +2,8 @@ import { useEffect, useState } from 'react';
 import {
   fetchPortfolioProjects,
   type PortfolioProject,
-} from './portfolioData';
+} from '../services/portfolioData';
+import TagList from '../components/ui/TagList';
 
 type LoadState = 'idle' | 'loading' | 'ready' | 'error';
 
@@ -48,8 +49,8 @@ export default function PortfolioPage() {
   }, [selectedProject]);
 
   return (
-    <main className="min-h-screen pt-28 pb-16 px-6">
-      <div className="max-w-6xl mx-auto space-y-8">
+    <main className="h-[100svh] pt-32 pb-10 px-6 md:h-screen md:pt-28 md:pb-16">
+      <div className="max-w-6xl mx-auto flex h-full flex-col gap-8">
         <header className="space-y-2">
           <p className="text-sm uppercase tracking-[0.2em] text-muted-foreground">
             Portfolio
@@ -59,7 +60,7 @@ export default function PortfolioPage() {
             Each card opens a modal with description, tech stack, and links.
           </p>
         </header>
-        <section className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
+        <section className="grid min-h-0 flex-1 gap-6 overflow-y-auto md:grid-cols-2 xl:grid-cols-3">
           {loadState === 'loading' && (
             <div className="rounded-lg border border-border bg-card p-5 text-sm text-muted-foreground">
               Loading projects...
@@ -79,16 +80,11 @@ export default function PortfolioPage() {
               <p className="mt-2 text-sm text-muted-foreground">
                 {project.summary}
               </p>
-              <div className="mt-4 flex flex-wrap gap-2">
-                {project.techStack.map((tech) => (
-                  <span
-                    key={tech}
-                    className="rounded-full border border-border px-3 py-1 text-xs text-muted-foreground"
-                  >
-                    {tech}
-                  </span>
-                ))}
-              </div>
+              <TagList
+                items={project.techStack}
+                label="Tech stack"
+                className="mt-4"
+              />
               <button
                 className="mt-4 inline-flex items-center text-sm font-medium text-primary"
                 type="button"
@@ -136,16 +132,11 @@ export default function PortfolioPage() {
             </p>
             <div className="mt-6">
               <h3 className="text-sm font-medium">Tech stack</h3>
-              <div className="mt-2 flex flex-wrap gap-2">
-                {selectedProject.techStack.map((tech) => (
-                  <span
-                    key={tech}
-                    className="rounded-full border border-border px-3 py-1 text-xs text-muted-foreground"
-                  >
-                    {tech}
-                  </span>
-                ))}
-              </div>
+              <TagList
+                items={selectedProject.techStack}
+                label="Tech stack"
+                className="mt-2"
+              />
             </div>
             <div className="mt-6 space-y-2">
               <h3 className="text-sm font-medium">Links</h3>

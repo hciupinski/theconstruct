@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { NavLink } from 'react-router-dom';
 
 const navItems = [
@@ -5,21 +6,41 @@ const navItems = [
   { label: 'Architect', to: '/architect' },
   { label: 'Portfolio', to: '/portfolio' },
   { label: 'Blog', to: '/blog' },
-  { label: 'Matrix', to: '/matrix' },
 ];
 
 export default function Navigation() {
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+
+  const closeSidebar = () => setIsSidebarOpen(false);
+
   return (
-    <div className="fixed top-0 left-0 right-0 z-10 p-6">
+    <div className="fixed top-0 left-0 right-0 z-10 p-6 bg-white">
       <div className="max-w-7xl mx-auto">
         <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-          <div>
-            <h1 className="text-2xl tracking-tight">The Construct</h1>
-            <p className="text-sm text-gray-600 mt-1">
-              Software • Architecture • Security
-            </p>
+          <div className="flex items-start justify-between gap-4 md:items-center">
+            <div>
+              <h1 className="text-2xl tracking-tight"><NavLink to="/">The Construct</NavLink></h1>
+              <p className="text-sm text-gray-600 mt-1">
+                Software • Architecture • Security
+              </p>
+            </div>
+            <button
+              type="button"
+              className="md:hidden inline-flex h-10 w-10 items-center justify-center rounded-md border border-gray-200 text-gray-700 transition hover:text-gray-900"
+              onClick={() => setIsSidebarOpen(true)}
+              aria-expanded={isSidebarOpen}
+              aria-controls="mobile-nav"
+              aria-label="Open menu"
+            >
+              <span className="sr-only">Open menu</span>
+              <span className="flex flex-col gap-1">
+                <span className="h-0.5 w-5 rounded bg-current" />
+                <span className="h-0.5 w-5 rounded bg-current" />
+                <span className="h-0.5 w-5 rounded bg-current" />
+              </span>
+            </button>
           </div>
-          <nav className="flex flex-wrap items-center gap-4 text-sm">
+          <nav className="hidden md:flex flex-wrap items-center gap-4 text-sm">
             {navItems.map((item) => (
               <NavLink
                 key={item.to}
@@ -38,6 +59,50 @@ export default function Navigation() {
           </nav>
         </div>
       </div>
+      <div
+        className={[
+          'fixed inset-0 bg-black/40 transition-opacity md:hidden',
+          isSidebarOpen ? 'opacity-100' : 'pointer-events-none opacity-0',
+        ].join(' ')}
+        onClick={closeSidebar}
+      />
+      <aside
+        id="mobile-nav"
+        className={[
+          'fixed top-0 right-0 h-full w-full bg-white shadow-xl transition-transform md:hidden',
+          isSidebarOpen ? 'translate-x-0' : 'translate-x-full',
+        ].join(' ')}
+        aria-hidden={!isSidebarOpen}
+      >
+        <div className="flex items-center justify-between border-b border-gray-100 p-4">
+          <span className="text-xl font-medium text-gray-700">The Construct</span>
+          <button
+            type="button"
+            className="rounded-md px-2 py-1 text-xl text-gray-600 transition hover:text-gray-900"
+            onClick={closeSidebar}
+          >
+            Close
+          </button>
+        </div>
+        <nav className="flex flex-col gap-3 p-4 text-4xl">
+          {navItems.map((item) => (
+            <NavLink
+              key={item.to}
+              to={item.to}
+              onClick={closeSidebar}
+              className={({ isActive }) =>
+                [
+                  'transition-colors',
+                  isActive ? 'text-foreground' : 'text-muted-foreground',
+                ].join(' ')
+              }
+              end={item.to === '/'}
+            >
+              {item.label}
+            </NavLink>
+          ))}
+        </nav>
+      </aside>
     </div>
   );
 }
