@@ -4,6 +4,7 @@ type MatrixPublishModalProps = {
   publishError: string | null;
   onClose: () => void;
   onPublish: () => void;
+  entityLabel?: string;
 };
 
 export default function MatrixPublishModal({
@@ -12,13 +13,17 @@ export default function MatrixPublishModal({
   publishError,
   onClose,
   onPublish,
+  entityLabel = 'post',
 }: MatrixPublishModalProps) {
   if (!isOpen) return null;
+
+  const titleLabel =
+    entityLabel.charAt(0).toUpperCase() + entityLabel.slice(1);
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/80 px-6 py-8">
       <div className="w-full max-w-md rounded-lg border border-border bg-card p-6 shadow-xl">
-        <h3 className="text-lg">Publish this post?</h3>
+        <h3 className="text-lg">Publish this {entityLabel}?</h3>
         <p className="mt-2 text-sm text-muted-foreground">
           Publishing is one-way. This will lock editing and set the published
           date.
@@ -41,7 +46,7 @@ export default function MatrixPublishModal({
             onClick={onPublish}
             disabled={isPublishing}
           >
-            {isPublishing ? 'Publishing...' : 'Publish now'}
+            {isPublishing ? `Publishing ${titleLabel}...` : 'Publish now'}
           </button>
         </div>
       </div>

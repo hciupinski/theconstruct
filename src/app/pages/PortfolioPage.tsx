@@ -62,12 +62,12 @@ export default function PortfolioPage() {
         </header>
         <section className="grid min-h-0 flex-1 gap-6 overflow-y-auto md:grid-cols-2 xl:grid-cols-3">
           {loadState === 'loading' && (
-            <div className="rounded-lg border border-border bg-card p-5 text-sm text-muted-foreground">
+            <div className="h-32 rounded-lg border border-border bg-card p-5 text-sm text-muted-foreground">
               Loading projects...
             </div>
           )}
           {loadState === 'error' && (
-            <div className="rounded-lg border border-border bg-card p-5 text-sm text-muted-foreground">
+            <div className="h-32 rounded-lg border border-border bg-card p-5 text-sm text-muted-foreground">
               Unable to load projects right now.
             </div>
           )}
