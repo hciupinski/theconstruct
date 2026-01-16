@@ -55,6 +55,20 @@
   letter-spacing: 0.08em;
 }
 
+@media (max-width: 768px) {
+  .matrix-cards {
+    flex-direction: column;
+    gap: 20px;
+    align-items: center;
+  }
+}
+
+@media (max-width: 768px) {
+  .matrix-card {
+    height:200px;
+  }
+}
+
 @keyframes shelfMove {
   0% {
     transform: translate3d(var(--x), var(--y), calc(var(--z) - var(--travel))) scale(0.65);

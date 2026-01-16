@@ -1,24 +1,47 @@
 import { useEffect, useMemo, useState } from 'react';
-import ReactQuill from 'react-quill';
-import 'react-quill/dist/quill.snow.css';
-import { fetchMatrixPosts, type MatrixPost } from './matrixData';
-
-type LoadState = 'idle' | 'loading' | 'ready' | 'error';
-type MatrixTab = 'posts' | 'portfolio';
+import {
+  createMatrixPost,
+  fetchMatrixPosts,
+  publishMatrixPost,
+  updateMatrixPost,
+  type MatrixPost,
+} from '../services/matrixData';
+import { getSupabaseClient } from '../lib/supabaseClient';
+import MatrixHeader from '../components/matrix/MatrixHeader';
+import MatrixPostEditor from '../components/matrix/MatrixPostEditor';
+import MatrixPostsList from '../components/matrix/MatrixPostsList';
+import MatrixPublishModal from '../components/matrix/MatrixPublishModal';
+import MatrixTabs from '../components/matrix/MatrixTabs';
+import type { LoadState, MatrixTab } from '../components/matrix/matrixTypes';
 
 export default function MatrixPage() {
   const [loadState, setLoadState] = useState<LoadState>('idle');
+  const [loadError, setLoadError] = useState<string | null>(null);
   const [posts, setPosts] = useState<MatrixPost[]>([]);
   const [activeTab, setActiveTab] = useState<MatrixTab>('posts');
   const [selectedPostId, setSelectedPostId] = useState<string | null>(null);
   const [draftTitle, setDraftTitle] = useState('');
+  const [draftExcerpt, setDraftExcerpt] = useState('');
   const [draftContent, setDraftContent] = useState('');
+  const [draftTagsInput, setDraftTagsInput] = useState('');
+  const [isCreatingNew, setIsCreatingNew] = useState(false);
+  const [showValidation, setShowValidation] = useState(false);
+  const [saveState, setSaveState] = useState<LoadState>('idle');
+  const [saveError, setSaveError] = useState<string | null>(null);
+  const [createState, setCreateState] = useState<LoadState>('idle');
+  const [createError, setCreateError] = useState<string | null>(null);
+  const [publishState, setPublishState] = useState<LoadState>('idle');
+  const [publishError, setPublishError] = useState<string | null>(null);
+  const [isPublishModalOpen, setIsPublishModalOpen] = useState(false);
+  const [signOutState, setSignOutState] = useState<LoadState>('idle');
+  const [signOutError, setSignOutError] = useState<string | null>(null);
 
   useEffect(() => {
     const controller = new AbortController();
 
     const loadPosts = async () => {
       try {
+        setLoadError(null);
         setLoadState('loading');
         const data = await fetchMatrixPosts({ signal: controller.signal });
         setPosts(data);
@@ -26,6 +49,11 @@ export default function MatrixPage() {
         setSelectedPostId(data[0]?.id ?? null);
       } catch (error) {
         if (controller.signal.aborted) return;
+        const message =
+          error instanceof Error
+            ? error.message
+            : 'Unable to load posts.';
+        setLoadError(message);
         setLoadState('error');
       }
     };
@@ -42,49 +70,241 @@ export default function MatrixPage() {
 
   useEffect(() => {
     if (!selectedPost) return;
+    setIsCreatingNew(false);
     setDraftTitle(selectedPost.title);
+    setDraftExcerpt(selectedPost.excerpt);
     setDraftContent(selectedPost.content);
+    setDraftTagsInput(selectedPost.tags.join(', '));
+    setShowValidation(false);
+    setSaveError(null);
+    setCreateError(null);
+    setPublishError(null);
   }, [selectedPost]);
 
   const isEditingLocked = selectedPost?.status === 'published';
+  const isSigningOut = signOutState === 'loading';
+  const isSaving = saveState === 'loading';
+  const isCreating = createState === 'loading';
+  const isPublishing = publishState === 'loading';
+
+  const normalizeTags = (value: string) =>
+    value
+      .split(',')
+      .map((tag) => tag.trim())
+      .filter(Boolean);
+
+  const getContentText = (value: string) =>
+    value.replace(/<[^>]*>/g, ' ').replace(/&nbsp;/g, ' ').trim();
+
+  const getMissingFields = (post: MatrixPost) => {
+    const missing: string[] = [];
+
+    if (!post.title.trim()) {
+      missing.push('title');
+    }
+
+    if (!post.excerpt.trim()) {
+      missing.push('excerpt');
+    }
+
+    if (!getContentText(post.content)) {
+      missing.push('content');
+    }
+
+    if (!post.tags.length) {
+      missing.push('tags');
+    }
+
+    return missing;
+  };
+
+  const resetDraftForm = () => {
+    setDraftTitle('');
+    setDraftExcerpt('');
+    setDraftContent('');
+    setDraftTagsInput('');
+    setShowValidation(false);
+    setSaveError(null);
+    setCreateError(null);
+    setPublishError(null);
+  };
+
+  const validation = useMemo(() => {
+    const errors: Partial<
+      Record<'title' | 'excerpt' | 'content' | 'tags', string>
+    > = {};
+    const tags = normalizeTags(draftTagsInput);
+
+    if (!draftTitle.trim()) {
+      errors.title = 'Title is required.';
+    }
+
+    if (!draftExcerpt.trim()) {
+      errors.excerpt = 'Excerpt is required.';
+    }
+
+    if (!getContentText(draftContent)) {
+      errors.content = 'Content is required.';
+    }
+
+    if (tags.length === 0) {
+      errors.tags = 'At least one tag is required.';
+    }
+
+    return {
+      errors,
+      isValid: Object.keys(errors).length === 0,
+      tags,
+    };
+  }, [draftContent, draftExcerpt, draftTagsInput, draftTitle]);
+
+  const handleSignOut = async () => {
+    try {
+      setSignOutError(null);
+      setSignOutState('loading');
+      const supabase = getSupabaseClient();
+      await supabase.auth.signOut();
+      setSignOutState('ready');
+    } catch (error) {
+      const message =
+        error instanceof Error ? error.message : 'Failed to sign out.';
+      setSignOutError(message);
+      setSignOutState('error');
+    }
+  };
+
+  const handleStartNewDraft = () => {
+    setSelectedPostId(null);
+    setIsCreatingNew(true);
+    resetDraftForm();
+  };
+
+  const handleCreateDraft = async () => {
+    if (isCreating || isSaving || isPublishing) {
+      return;
+    }
+
+    if (!validation.isValid) {
+      setShowValidation(true);
+      return;
+    }
+
+    try {
+      setCreateError(null);
+      setCreateState('loading');
+      const newPost = await createMatrixPost({
+        title: draftTitle.trim(),
+        excerpt: draftExcerpt.trim(),
+        content: draftContent,
+        tags: validation.tags,
+      });
+      setPosts((prev) => [newPost, ...prev]);
+      setSelectedPostId(newPost.id);
+      setIsCreatingNew(false);
+      setCreateState('ready');
+      setShowValidation(false);
+    } catch (error) {
+      const message =
+        error instanceof Error ? error.message : 'Failed to create post.';
+      setCreateError(message);
+      setCreateState('error');
+    }
+  };
+
+  const handlePublishDraft = async () => {
+    if (isPublishing || isSaving || isCreating) {
+      return;
+    }
+
+    if (!selectedPostId || !selectedPost) {
+      setPublishError('Select a draft to publish.');
+      setPublishState('error');
+      return;
+    }
+
+    if (selectedPost.status !== 'draft') {
+      setPublishError('Only draft posts can be published.');
+      setPublishState('error');
+      return;
+    }
+
+    if (!validation.isValid) {
+      setShowValidation(true);
+      return;
+    }
+
+    try {
+      setPublishError(null);
+      setPublishState('loading');
+      const publishedPost = await publishMatrixPost(selectedPostId);
+      const refreshedPosts = await fetchMatrixPosts();
+      setPosts(refreshedPosts);
+      setSelectedPostId(publishedPost.id);
+      setPublishState('ready');
+      setIsPublishModalOpen(false);
+      setShowValidation(false);
+    } catch (error) {
+      const message =
+        error instanceof Error ? error.message : 'Failed to publish post.';
+      setPublishError(message);
+      setPublishState('error');
+    }
+  };
+
+  const handleSaveDraft = async () => {
+    if (isSaving || isCreating || isPublishing) {
+      return;
+    }
+
+    if (!selectedPostId) {
+      setSaveError('Select a post to save.');
+      setSaveState('error');
+      return;
+    }
+
+    if (!selectedPost || selectedPost.status !== 'draft') {
+      setSaveError('Only draft posts can be updated.');
+      setSaveState('error');
+      return;
+    }
+
+    if (!validation.isValid) {
+      setShowValidation(true);
+      return;
+    }
+
+    try {
+      setSaveError(null);
+      setSaveState('loading');
+      const updatedPost = await updateMatrixPost(selectedPostId, {
+        title: draftTitle.trim(),
+        excerpt: draftExcerpt.trim(),
+        content: draftContent,
+        tags: validation.tags,
+      });
+      const refreshedPosts = await fetchMatrixPosts();
+      setPosts(refreshedPosts);
+      setSelectedPostId(updatedPost.id);
+      setSaveState('ready');
+      setShowValidation(false);
+    } catch (error) {
+      const message =
+        error instanceof Error ? error.message : 'Failed to save post.';
+      setSaveError(message);
+      setSaveState('error');
+    }
+  };
 
   return (
     <main className="min-h-screen pt-28 pb-16 px-6">
       <div className="max-w-6xl mx-auto space-y-6">
-        <header className="space-y-2">
-          <p className="text-sm uppercase tracking-[0.2em] text-muted-foreground">
-            Matrix
-          </p>
-          <h1 className="text-3xl">Authoring Console</h1>
-          <p className="text-muted-foreground">
-            Draft posts, approve releases, and manage assets with gated access.
-          </p>
-        </header>
+        <MatrixHeader
+          onSignOut={handleSignOut}
+          isSigningOut={isSigningOut}
+          signOutError={signOutError}
+        />
 
-        <div className="flex flex-wrap gap-3">
-          <button
-            type="button"
-            className={`rounded-full border px-4 py-2 text-sm ${
-              activeTab === 'posts'
-                ? 'border-primary text-primary'
-                : 'border-border text-muted-foreground'
-            }`}
-            onClick={() => setActiveTab('posts')}
-          >
-            Blog posts
-          </button>
-          <button
-            type="button"
-            className={`rounded-full border px-4 py-2 text-sm ${
-              activeTab === 'portfolio'
-                ? 'border-primary text-primary'
-                : 'border-border text-muted-foreground'
-            }`}
-            onClick={() => setActiveTab('portfolio')}
-          >
-            Portfolio items
-          </button>
-        </div>
+        <MatrixTabs activeTab={activeTab} onChange={setActiveTab} />
 
         {activeTab === 'portfolio' && (
           <section className="rounded-lg border border-border bg-card p-6 text-sm text-muted-foreground">
@@ -95,137 +315,51 @@ export default function MatrixPage() {
 
         {activeTab === 'posts' && (
           <div className="grid gap-6 lg:grid-cols-[320px_1fr]">
-            <section className="rounded-lg border border-border bg-card p-4">
-              <div className="flex items-center justify-between">
-                <h2 className="text-lg">Posts</h2>
-                <button
-                  type="button"
-                  className="text-sm text-primary"
-                  aria-label="Create new draft post"
-                >
-                  New draft
-                </button>
-              </div>
-              <div className="mt-4 space-y-3">
-                {loadState === 'loading' && (
-                  <p className="text-sm text-muted-foreground">
-                    Loading posts...
-                  </p>
-                )}
-                {loadState === 'error' && (
-                  <p className="text-sm text-muted-foreground">
-                    Unable to load posts.
-                  </p>
-                )}
-                {posts.map((post) => (
-                  <button
-                    key={post.id}
-                    type="button"
-                    onClick={() => setSelectedPostId(post.id)}
-                    className={`w-full rounded-lg border px-4 py-3 text-left text-sm ${
-                      post.id === selectedPostId
-                        ? 'border-primary text-primary'
-                        : 'border-border text-muted-foreground'
-                    }`}
-                  >
-                    <div className="flex items-center justify-between">
-                      <span className="font-medium text-foreground">
-                        {post.title}
-                      </span>
-                      <span className="text-xs uppercase tracking-[0.2em]">
-                        {post.status}
-                      </span>
-                    </div>
-                    <p className="mt-2 text-xs text-muted-foreground">
-                      Updated {post.updatedAt}
-                    </p>
-                  </button>
-                ))}
-              </div>
-            </section>
+            <MatrixPostsList
+              posts={posts}
+              loadState={loadState}
+              loadError={loadError}
+              selectedPostId={selectedPostId}
+              onSelectPost={setSelectedPostId}
+              onCreateNew={handleStartNewDraft}
+              isCreateDisabled={isCreating || isSaving}
+              getMissingFields={getMissingFields}
+            />
 
-            <section className="rounded-lg border border-border bg-card p-6">
-              {!selectedPost && (
-                <p className="text-sm text-muted-foreground">
-                  Select a post to view or edit content.
-                </p>
-              )}
-              {selectedPost && (
-                <div className="space-y-6">
-                  <div className="flex flex-wrap items-center justify-between gap-3">
-                    <div>
-                      <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">
-                        {selectedPost.status === 'published'
-                          ? 'Approved'
-                          : 'Draft'}
-                      </p>
-                      <h2 className="text-2xl">{selectedPost.title}</h2>
-                    </div>
-                    <button
-                      type="button"
-                      className="rounded-full border border-border px-4 py-2 text-sm text-muted-foreground"
-                      disabled={isEditingLocked}
-                    >
-                      {isEditingLocked ? 'Approved' : 'Approve post'}
-                    </button>
-                  </div>
-
-                  <div className="space-y-3">
-                    <label className="text-sm font-medium">Title</label>
-                    <input
-                      type="text"
-                      value={draftTitle}
-                      onChange={(event) => setDraftTitle(event.target.value)}
-                      className="w-full rounded-lg border border-border bg-transparent px-4 py-3 text-sm"
-                      disabled={isEditingLocked}
-                    />
-                  </div>
-
-                  <div className="space-y-3">
-                    <label className="text-sm font-medium">
-                      Content
-                    </label>
-                    <ReactQuill
-                      theme="snow"
-                      value={draftContent}
-                      onChange={setDraftContent}
-                      readOnly={isEditingLocked}
-                      className="rounded-lg border border-border bg-transparent text-sm"
-                    />
-                    <p className="text-xs text-muted-foreground">
-                      Rich text editor supports image embeds for JPG and GIF.
-                    </p>
-                  </div>
-
-                  <div className="flex flex-wrap gap-3">
-                    <button
-                      type="button"
-                      className="rounded-full border border-border px-4 py-2 text-sm text-muted-foreground"
-                      disabled={isEditingLocked}
-                    >
-                      Upload media
-                    </button>
-                    <button
-                      type="button"
-                      className="rounded-full border border-border px-4 py-2 text-sm text-muted-foreground"
-                      disabled={isEditingLocked}
-                    >
-                      Save draft
-                    </button>
-                    <button
-                      type="button"
-                      className="rounded-full border border-border px-4 py-2 text-sm text-destructive"
-                      disabled={isEditingLocked}
-                    >
-                      Delete
-                    </button>
-                  </div>
-                </div>
-              )}
-            </section>
+            <MatrixPostEditor
+              selectedPost={selectedPost}
+              isCreatingNew={isCreatingNew}
+              isEditingLocked={isEditingLocked}
+              draftTitle={draftTitle}
+              draftExcerpt={draftExcerpt}
+              draftContent={draftContent}
+              draftTagsInput={draftTagsInput}
+              onTitleChange={setDraftTitle}
+              onExcerptChange={setDraftExcerpt}
+              onContentChange={setDraftContent}
+              onTagsChange={setDraftTagsInput}
+              showValidation={showValidation}
+              validation={validation}
+              onOpenPublishModal={() => setIsPublishModalOpen(true)}
+              isPublishing={isPublishing}
+              isSaving={isSaving}
+              isCreating={isCreating}
+              onSave={isCreatingNew ? handleCreateDraft : handleSaveDraft}
+              saveError={saveError}
+              createError={createError}
+              publishError={publishError}
+            />
           </div>
         )}
       </div>
+
+      <MatrixPublishModal
+        isOpen={isPublishModalOpen}
+        isPublishing={isPublishing}
+        publishError={publishError}
+        onClose={() => setIsPublishModalOpen(false)}
+        onPublish={handlePublishDraft}
+      />
     </main>
   );
 }
