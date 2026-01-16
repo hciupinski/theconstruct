@@ -5,6 +5,7 @@ import BlogPage from './pages/BlogPage';
 import HomePage from './pages/HomePage';
 import MatrixPage from './pages/MatrixPage';
 import PortfolioPage from './pages/PortfolioPage';
+import MatrixAuthGate from './components/MatrixAuthGate';
 
 export default function App() {
   return (
@@ -15,7 +16,14 @@ export default function App() {
         <Route path="/architect" element={<ArchitectPage />} />
         <Route path="/portfolio" element={<PortfolioPage />} />
         <Route path="/blog" element={<BlogPage />} />
-        <Route path="/matrix" element={<MatrixPage />} />
+        <Route
+          path="/matrix"
+          element={
+            <MatrixAuthGate>
+              <MatrixPage />
+            </MatrixAuthGate>
+          }
+        />
       </Routes>
     </div>
   );
