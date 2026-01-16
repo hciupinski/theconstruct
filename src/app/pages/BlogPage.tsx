@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { fetchBlogPosts, type BlogPost } from './blogData';
 
 type LoadState = 'idle' | 'loading' | 'ready' | 'error';
@@ -41,8 +42,11 @@ export default function BlogPage() {
         </header>
         <section className="space-y-4">
           {loadState === 'loading' && (
-            <div className="rounded-lg border border-border bg-card p-5 text-sm text-muted-foreground">
-              Loading posts...
+            <div className="rounded-lg border border-border bg-card p-6 text-sm text-muted-foreground">
+              <div className="flex items-center gap-3">
+                <span className="h-5 w-5 animate-spin rounded-full border-2 border-border border-t-foreground" />
+                <span>Loading posts...</span>
+              </div>
             </div>
           )}
           {loadState === 'error' && (
@@ -51,28 +55,27 @@ export default function BlogPage() {
             </div>
           )}
           {posts.map((post) => (
-            <article
-              key={post.id}
-              className="rounded-lg border border-border bg-card p-5"
-            >
-              <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">
-                {post.publishedAt}
-              </p>
-              <h2 className="mt-2 text-xl">{post.title}</h2>
-              <p className="mt-2 text-sm text-muted-foreground">
-                {post.excerpt}
-              </p>
-              <div className="mt-4 flex flex-wrap gap-2">
-                {post.tags.map((tag) => (
-                  <span
-                    key={tag}
-                    className="rounded-full border border-border px-3 py-1 text-xs text-muted-foreground"
-                  >
-                    {tag}
-                  </span>
-                ))}
-              </div>
-            </article>
+            <Link key={post.id} to={`/blog/${post.id}`}>
+              <article className="rounded-lg border border-border bg-card p-5 transition hover:border-foreground/30 hover:bg-card/80">
+                <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">
+                  {post.publishedAt}
+                </p>
+                <h2 className="mt-2 text-xl">{post.title}</h2>
+                <p className="mt-2 text-sm text-muted-foreground">
+                  {post.excerpt}
+                </p>
+                <div className="mt-4 flex flex-wrap gap-2">
+                  {post.tags.map((tag) => (
+                    <span
+                      key={tag}
+                      className="rounded-full border border-border px-3 py-1 text-xs text-muted-foreground"
+                    >
+                      {tag}
+                    </span>
+                  ))}
+                </div>
+              </article>
+            </Link>
           ))}
         </section>
       </div>
