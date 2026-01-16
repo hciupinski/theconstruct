@@ -74,7 +74,7 @@ export default function PortfolioPage() {
           {projects.map((project) => (
             <article
               key={project.id}
-              className="rounded-lg border border-border bg-card p-5 shadow-sm"
+              className="flex h-64 flex-col rounded-lg border border-border bg-card p-5 shadow-sm"
             >
               <h2 className="text-lg">{project.title}</h2>
               <p className="mt-2 text-sm text-muted-foreground">
@@ -86,7 +86,7 @@ export default function PortfolioPage() {
                 className="mt-4"
               />
               <button
-                className="mt-4 inline-flex items-center text-sm font-medium text-primary"
+                className="mt-auto inline-flex items-center pt-4 text-sm font-medium text-primary"
                 type="button"
                 onClick={() => setSelectedProject(project)}
                 aria-haspopup="dialog"
