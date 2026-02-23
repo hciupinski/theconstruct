@@ -36,9 +36,8 @@ export default function BlogPage() {
           <p className="text-sm uppercase tracking-[0.2em] text-muted-foreground">
             Blog
           </p>
-          <h1 className="text-3xl">Notes and Articles</h1>
           <p className="text-muted-foreground">
-            Published posts will appear here for public reading.
+            Get more familiar with my point of view.
           </p>
         </header>
         <section className="min-h-0 flex-1 space-y-4 overflow-y-auto">
@@ -53,6 +52,11 @@ export default function BlogPage() {
           {loadState === 'error' && (
             <div className="rounded-lg border border-border bg-card p-5 text-sm text-muted-foreground">
               Unable to load posts right now.
+            </div>
+          )}
+          {posts.length === 0 && loadState === 'ready' && (
+            <div className="rounded-lg border border-border bg-card p-5 text-sm text-muted-foreground">
+              No posts available right now.
             </div>
           )}
           {posts.map((post) => (

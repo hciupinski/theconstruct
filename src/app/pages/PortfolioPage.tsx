@@ -49,18 +49,17 @@ export default function PortfolioPage() {
   }, [selectedProject]);
 
   return (
-    <main className="h-[100svh] pt-32 pb-10 px-6 md:h-screen md:pt-28 md:pb-16">
-      <div className="max-w-6xl mx-auto flex h-full flex-col gap-8">
+    <main className="min-h-screen pt-32 pb-10 px-6 md:pt-28 md:pb-16">
+      <div className="max-w-6xl mx-auto flex flex-col gap-8">
         <header className="space-y-2">
           <p className="text-sm uppercase tracking-[0.2em] text-muted-foreground">
             Portfolio
           </p>
-          <h1 className="text-3xl">Project Highlights</h1>
           <p className="text-muted-foreground">
             Each card opens a modal with description, tech stack, and links.
           </p>
         </header>
-        <section className="grid min-h-0 flex-1 gap-6 overflow-y-auto md:grid-cols-2 xl:grid-cols-3">
+        <section className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
           {loadState === 'loading' && (
             <div className="h-32 rounded-lg border border-border bg-card p-5 text-sm text-muted-foreground">
               Loading projects...
@@ -69,6 +68,11 @@ export default function PortfolioPage() {
           {loadState === 'error' && (
             <div className="h-32 rounded-lg border border-border bg-card p-5 text-sm text-muted-foreground">
               Unable to load projects right now.
+            </div>
+          )}
+          {projects.length === 0 && loadState === 'ready' && (
+            <div className="rounded-lg border border-border bg-card p-5 text-sm text-muted-foreground">
+              No projects available right now.
             </div>
           )}
           {projects.map((project) => (
