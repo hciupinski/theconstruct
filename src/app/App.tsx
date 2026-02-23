@@ -10,7 +10,7 @@ import MatrixAuthGate from './components/MatrixAuthGate';
 
 export default function App() {
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen font-mono">
       <Navigation />
       <Routes>
         <Route path="/" element={<HomePage />} />
