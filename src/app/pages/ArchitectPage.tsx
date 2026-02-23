@@ -160,7 +160,7 @@ export default function ArchitectPage() {
   }, [awaitingInput, isTyping]);
 
   return (
-    <main className="min-h-screen pt-28 pb-2 px-6">
+    <main className="min-h-screen pt-32 pb-10 px-6 md:pt-28 md:pb-16">
       <div className="max-w-5xl mx-auto space-y-6">
         <header className="space-y-2">
           <p className="text-sm uppercase tracking-[0.2em] text-muted-foreground">
