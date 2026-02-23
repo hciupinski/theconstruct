@@ -13,7 +13,7 @@ const LINKS = [
 
 export default function Instructions() {
   return (
-    <div className="fixed bottom-0 right-0 z-10 p-6">
+    <div className="fixed bottom-0 right-0 z-10 p-5 md:p-6">
       <div className="max-w-7xl mx-auto">
         <div className="bg-white/80 backdrop-blur-sm border border-gray-200 rounded-lg p-4 shadow-sm inline-block">
           <div className="flex items-center gap-6 text-sm text-gray-600">

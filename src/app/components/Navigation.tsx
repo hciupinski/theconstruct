@@ -14,13 +14,13 @@ export default function Navigation() {
   const closeSidebar = () => setIsSidebarOpen(false);
 
   return (
-    <div className="fixed top-0 left-0 right-0 z-10 p-6 bg-white">
+    <div className="fixed top-0 left-0 right-0 z-10 bg-white px-5 py-6 md:p-6">
       <div className="max-w-7xl mx-auto">
         <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-          <div className="flex items-start justify-between gap-4 md:items-center">
+          <div className="flex items-start justify-between gap-3 md:items-center md:gap-4">
             <div>
               <h1 className="text-2xl tracking-tight"><NavLink to="/">The Construct</NavLink></h1>
-              <p className="text-sm text-gray-600 mt-1">
+              <p className="mt-1 text-sm whitespace-nowrap text-gray-600">
                 Software • Architecture • Security
               </p>
             </div>
