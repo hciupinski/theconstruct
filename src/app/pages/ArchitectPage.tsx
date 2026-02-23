@@ -166,6 +166,9 @@ export default function ArchitectPage() {
           <p className="text-sm uppercase tracking-[0.2em] text-muted-foreground">
             Resume
           </p>
+          <p className="text-muted-foreground">
+            Few words about my background and experience.
+          </p>
         </header>
 
         <section className="p-0">
