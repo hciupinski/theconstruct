@@ -40,6 +40,32 @@ for all
 using (auth.uid() in (select user_id from public.matrix_admins))
 with check (auth.uid() in (select user_id from public.matrix_admins));
 
+-- PORTFOLIO PROJECTS TABLE
+alter table if exists public.portfolio_projects enable row level security;
+
+drop policy if exists "portfolio_projects_public_read" on public.portfolio_projects;
+drop policy if exists "portfolio_projects_admin_read" on public.portfolio_projects;
+drop policy if exists "portfolio_projects_admin_write" on public.portfolio_projects;
+
+create policy "portfolio_projects_public_read"
+on public.portfolio_projects
+for select
+to anon
+using (status = 'published');
+
+create policy "portfolio_projects_admin_read"
+on public.portfolio_projects
+for select
+to authenticated
+using (auth.uid() in (select user_id from public.matrix_admins));
+
+create policy "portfolio_projects_admin_write"
+on public.portfolio_projects
+for all
+to authenticated
+using (auth.uid() in (select user_id from public.matrix_admins))
+with check (auth.uid() in (select user_id from public.matrix_admins));
+
 -- STORAGE BUCKET
 -- Create the bucket if it doesn't exist.
 insert into storage.buckets (id, name, public)
