@@ -33,3 +33,8 @@ const project = await readFile(resolve(dist, 'portfolio', firstProject.name, 'in
 assert.match(project, /"@type":"CreativeWork"/);
 assert.match(project, /<link rel="canonical" href="https:\/\/theconstruct\.ing\/portfolio\//);
 assert.doesNotMatch(project, /hciupinski\.github\.io/);
+
+await access(resolve(dist, 'sitemap-index.xml'));
+const rss = await readFile(resolve(dist, 'rss.xml'), 'utf8');
+assert.match(rss, /https:\/\/theconstruct\.ing\//);
+assert.doesNotMatch(rss, /hciupinski\.github\.io/);
