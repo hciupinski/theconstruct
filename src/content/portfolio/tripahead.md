@@ -10,8 +10,8 @@ techStack:
   - Docker
   - Keycloak
 links:
-  - label: Private repository
-    href: https://github.com/hciupinski/TripAhead
+  - label: Website
+    href: https://dev.tripahead.fun
 draft: false
 ---
 

@@ -11,7 +11,7 @@ links:
   - label: Repository
     href: https://github.com/hciupinski/theconstruct
   - label: Live site
-    href: https://theconstruct.vercel.app
+    href: https://theconstruct.ing
 draft: false
 ---
 
