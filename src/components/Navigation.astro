@@ -9,14 +9,34 @@ const navItems = [
 ];
 ---
 
-<header class="fixed top-0 right-0 left-0 z-10 p-6">
+<header class="fixed top-0 right-0 left-0 z-10 bg-white px-5 py-6 md:p-6" data-navigation>
   <div class="mx-auto max-w-7xl">
     <div class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-      <div>
-        <a href={base} class="text-2xl tracking-tight">The Construct</a>
-        <p class="mt-1 text-sm text-gray-600">Software • Architecture • Security</p>
+      <div class="flex items-start justify-between gap-3 md:items-center md:gap-4">
+        <div>
+          <a href={base} class="inline-flex items-end gap-1 whitespace-nowrap text-2xl leading-none tracking-tight">
+            <span>The Construct</span>
+            <span class="rounded-sm bg-[#161616] px-1 py-0.5 text-[0.58em] font-semibold leading-none tracking-[0.01em] text-white">.ing</span>
+          </a>
+          <p class="mt-1 whitespace-nowrap text-sm text-gray-600">Software • Architecture • Security</p>
+        </div>
+        <button
+          type="button"
+          class="inline-flex h-10 w-10 items-center justify-center rounded-md border border-gray-200 text-gray-700 transition hover:text-gray-900 md:hidden"
+          data-menu-open
+          aria-expanded="false"
+          aria-controls="mobile-nav"
+          aria-label="Open menu"
+        >
+          <span class="sr-only">Open menu</span>
+          <span class="flex flex-col gap-1" aria-hidden="true">
+            <span class="h-0.5 w-5 rounded bg-current"></span>
+            <span class="h-0.5 w-5 rounded bg-current"></span>
+            <span class="h-0.5 w-5 rounded bg-current"></span>
+          </span>
+        </button>
       </div>
-      <nav class="flex flex-wrap items-center gap-4 text-sm" aria-label="Main navigation">
+      <nav class="hidden flex-wrap items-center gap-4 text-sm md:flex" aria-label="Main navigation">
         {
           navItems.map((item) => (
             <a
@@ -34,4 +54,71 @@ const navItems = [
       </nav>
     </div>
   </div>
+  <div
+    class="pointer-events-none fixed inset-0 bg-black/40 opacity-0 transition-opacity md:hidden"
+    data-menu-overlay
+  ></div>
+  <aside
+    id="mobile-nav"
+    class="fixed top-0 right-0 h-full w-full translate-x-full bg-white shadow-xl transition-transform md:hidden"
+    aria-hidden="true"
+    data-menu-panel
+  >
+    <div class="flex items-center justify-between border-b border-gray-100 p-4">
+      <span class="inline-flex items-end gap-1 whitespace-nowrap text-xl font-medium leading-none text-gray-700">
+        <span>The Construct</span>
+        <span class="rounded-sm bg-[#161616] px-1 py-0.5 text-[0.58em] font-semibold leading-none tracking-[0.01em] text-white">.ing</span>
+      </span>
+      <button
+        type="button"
+        class="rounded-md px-2 py-1 text-xl text-gray-600 transition hover:text-gray-900"
+        data-menu-close
+      >
+        Close
+      </button>
+    </div>
+    <nav class="flex flex-col gap-3 p-4 text-4xl" aria-label="Mobile navigation">
+      {
+        navItems.map((item) => (
+          <a
+            href={item.href}
+            class:list={{
+              'transition-colors': true,
+              'text-foreground': currentPath === item.href,
+              'text-muted-foreground': currentPath !== item.href,
+            }}
+            data-menu-link
+          >
+            {item.label}
+          </a>
+        ))
+      }
+    </nav>
+  </aside>
 </header>
+
+<script>
+  const navigation = document.querySelector<HTMLElement>('[data-navigation]');
+
+  if (navigation) {
+    const openButton = navigation.querySelector<HTMLButtonElement>('[data-menu-open]');
+    const closeButton = navigation.querySelector<HTMLButtonElement>('[data-menu-close]');
+    const overlay = navigation.querySelector<HTMLElement>('[data-menu-overlay]');
+    const panel = navigation.querySelector<HTMLElement>('[data-menu-panel]');
+    const links = navigation.querySelectorAll<HTMLAnchorElement>('[data-menu-link]');
+
+    const setMenuOpen = (isOpen: boolean) => {
+      openButton?.setAttribute('aria-expanded', String(isOpen));
+      panel?.setAttribute('aria-hidden', String(!isOpen));
+      panel?.classList.toggle('translate-x-full', !isOpen);
+      overlay?.classList.toggle('pointer-events-none', !isOpen);
+      overlay?.classList.toggle('opacity-0', !isOpen);
+      document.body.classList.toggle('overflow-hidden', isOpen);
+    };
+
+    openButton?.addEventListener('click', () => setMenuOpen(true));
+    closeButton?.addEventListener('click', () => setMenuOpen(false));
+    overlay?.addEventListener('click', () => setMenuOpen(false));
+    links.forEach((link) => link.addEventListener('click', () => setMenuOpen(false)));
+  }
+</script>
