@@ -42,6 +42,10 @@
           },
           "minItems": 1
         },
+        "seoTitle": {
+          "type": "string",
+          "minLength": 1
+        },
         "coverImage": {
           "type": "string"
         },
