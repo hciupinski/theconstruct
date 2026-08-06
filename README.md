@@ -6,7 +6,7 @@ mergu commita do `main`.
 
 ## Lokalny rozwój
 
-Wymagany jest Node.js 20+ oraz pnpm 11+.
+Wymagany jest Node.js 22.13+ oraz pnpm 11+.
 
 ```sh
 pnpm install
