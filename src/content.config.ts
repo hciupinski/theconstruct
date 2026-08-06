@@ -9,6 +9,7 @@ const blog = defineCollection({
     publishedAt: z.coerce.date(),
     updatedAt: z.coerce.date().optional(),
     tags: z.array(z.string().min(1)).min(1),
+    seoTitle: z.string().min(1).optional(),
     coverImage: z.string().optional(),
     draft: z.boolean().default(false),
   }),
@@ -28,6 +29,7 @@ const portfolio = defineCollection({
         })
       )
       .min(1),
+    seoTitle: z.string().min(1).optional(),
     coverImage: z.string().optional(),
     updatedAt: z.coerce.date().optional(),
     draft: z.boolean().default(false),

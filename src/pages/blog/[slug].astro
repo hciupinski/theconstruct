@@ -1,6 +1,7 @@
 ---
 import { getCollection, render, type CollectionEntry } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
+import { tagToSlug } from '../../utils/tags';
 
 type Props = {
   post: CollectionEntry<'blog'>;
@@ -26,7 +27,14 @@ const formatDate = (date: Date) => new Intl.DateTimeFormat('en', { dateStyle: 'l
         <h1 class="text-4xl leading-tight">{post.data.title}</h1>
         <p class="text-lg text-muted-foreground">{post.data.excerpt}</p>
         <div class="flex flex-wrap gap-2">
-          {post.data.tags.map((tag) => <span class="rounded-full border border-border px-3 py-1 text-xs text-muted-foreground">{tag}</span>)}
+          {post.data.tags.map((tag) => (
+            <a
+              class="rounded-full border border-border px-3 py-1 text-xs text-muted-foreground hover:text-foreground"
+              href={`${base}blog/tags/${tagToSlug(tag)}/`}
+            >
+              {tag}
+            </a>
+          ))}
         </div>
       </header>
       <div class="content-prose mt-10"><Content /></div>
