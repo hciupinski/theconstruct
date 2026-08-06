@@ -10,7 +10,7 @@ export const site = {
     github: 'https://github.com/hciupinski/',
     linkedin: 'https://www.linkedin.com/in/hubert-ciupinski/',
   },
-  defaultImage: '/og-default.svg',
+  defaultImage: '/og-default.png',
 } as const;
 
 export const absoluteUrl = (path: string) => new URL(path, `${site.origin}/`).toString();
