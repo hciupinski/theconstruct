@@ -71,7 +71,7 @@ export default function MatrixConstructScene() {
   };
 
   return (
-    <div className="matrix-scene" style={sceneStyle}>
+    <div className="matrix-scene" style={sceneStyle} aria-hidden="true">
       <div className="matrix-aisle">
         {shelves.map(item => (
           <div key={item.key} className="matrix-shelf" style={item.style} />
