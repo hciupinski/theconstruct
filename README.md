@@ -1,30 +1,80 @@
 # The Construct
 
-## Running the code
+Statyczne portfolio i blog budowane przez Astro, publikowane na GitHub Pages.
+Treść jest wersjonowana w repozytorium jako Markdown — publikacja następuje po
+mergu commita do `main`.
 
-Run `npm i` to install the dependencies.
+## Lokalny rozwój
 
-Run `npm run dev` to start the development server.
+Wymagany jest Node.js 20+ oraz pnpm 11+.
 
-## CI/CD (GitHub Actions)
+```sh
+pnpm install
+pnpm dev
+```
 
-This repo uses a GitHub Actions workflow to apply Supabase migrations and deploy to Vercel on pushes to `main`.
+Przed wysłaniem zmian uruchom:
 
-### Required GitHub Secrets
+```sh
+pnpm check
+pnpm build
+```
 
-Supabase:
-- `SUPABASE_ACCESS_TOKEN`: Personal access token from Supabase.
-- `SUPABASE_PROJECT_REF`: Project ref (e.g., `abcdefghijklmnop`).
-- `SUPABASE_DB_PASSWORD`: Database password for the project.
+## Dodawanie wpisu na blogu
 
-Vercel:
-- `VERCEL_TOKEN`: Vercel personal access token.
-- `VERCEL_ORG_ID`: Vercel team/org ID.
-- `VERCEL_PROJECT_ID`: Vercel project ID.
+Dodaj plik `src/content/blog/<slug>.md`. Nazwa pliku staje się publicznym
+adresem wpisu: `/blog/<slug>/`.
 
-### One-time setup
+```md
+---
+title: Title of the post
+excerpt: A short description used on the listing and for SEO.
+publishedAt: 2026-08-06
+tags:
+  - Architecture
+  - Cloud
+draft: false
+---
 
-1. Run the migration in `supabase/migrations/20250308120000_matrix_rls.sql` (it creates an allowlist table and policies).
-2. After signing in once, insert your user ID into `public.matrix_admins`:
-   - `insert into public.matrix_admins (user_id) values ('YOUR_USER_ID');`
-3. Configure the secrets above in your GitHub repo settings.
+Markdown content goes here.
+```
+
+Wymagane pola to `title`, `excerpt`, `publishedAt` i `tags`. Opcjonalne pola:
+`updatedAt`, `coverImage` i `draft`. Wpis z `draft: true` jest sprawdzany przy
+buildzie, ale nie jest publikowany ani widoczny w RSS.
+
+## Dodawanie projektu
+
+Dodaj plik `src/content/portfolio/<slug>.md`. Wymagane pola to `title`,
+`summary`, `techStack` i `links`:
+
+```md
+---
+title: Project title
+summary: One-sentence project description.
+techStack:
+  - Astro
+  - TypeScript
+links:
+  - label: Repository
+    href: https://github.com/example/project
+draft: false
+---
+
+Longer project description in Markdown.
+```
+
+`links` jest listą obiektów z polami `label` i pełnym adresem `href`.
+
+## Publikacja
+
+Workflow GitHub Actions waliduje pull requesty i po pushu do `main` buduje oraz
+publikuje katalog `dist` na GitHub Pages. Jednorazowo w ustawieniach repozytorium
+wybierz **Settings → Pages → Source: GitHub Actions**.
+
+Domyślny adres projektu to
+`https://hciupinski.github.io/theconstruct/`. Konfiguracja `base` w
+`astro.config.mjs` jest wymagana, aby działaly linki i assety pod tym adresem.
+
+Sitemap jest generowany podczas buildu, a kanał RSS jest dostępny pod
+`/theconstruct/rss.xml`.

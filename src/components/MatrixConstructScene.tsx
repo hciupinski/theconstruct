@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { CONFIG } from './scene.constants';
-import './scene.css';
+import { CONFIG } from './matrix-construct-scene.constants';
+import './matrix-construct-scene.css';
 
 type ShelfStyle = React.CSSProperties & {
   ['--x']?: string;
