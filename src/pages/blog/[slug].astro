@@ -1,6 +1,8 @@
 ---
 import { getCollection, render, type CollectionEntry } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
+import RelatedContent from '../../components/RelatedContent.astro';
+import { absoluteImageUrl, absoluteUrl, site } from '../../config/site';
 import { tagToSlug } from '../../utils/tags';
 
 type Props = {
@@ -16,9 +18,39 @@ const { post } = Astro.props as Props;
 const { Content } = await render(post);
 const base = import.meta.env.BASE_URL;
 const formatDate = (date: Date) => new Intl.DateTimeFormat('en', { dateStyle: 'long' }).format(date);
+const title = post.data.seoTitle ?? post.data.title;
+const canonical = absoluteUrl(`${base}blog/${post.id}/`);
+const relatedPosts = (await getCollection('blog', ({ data }) => !data.draft))
+  .filter((candidate) => candidate.id !== post.id && candidate.data.tags.some((tag) => post.data.tags.includes(tag)))
+  .sort((left, right) => right.data.publishedAt.valueOf() - left.data.publishedAt.valueOf())
+  .slice(0, 3)
+  .map((candidate) => ({
+    title: candidate.data.title,
+    href: `${base}blog/${candidate.id}/`,
+    description: candidate.data.excerpt,
+  }));
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'BlogPosting',
+  headline: title,
+  description: post.data.excerpt,
+  image: absoluteImageUrl(post.data.coverImage),
+  datePublished: post.data.publishedAt.toISOString(),
+  ...(post.data.updatedAt ? { dateModified: post.data.updatedAt.toISOString() } : {}),
+  mainEntityOfPage: canonical,
+  author: { '@type': 'Person', name: site.author.name },
+};
 ---
 
-<BaseLayout title={`${post.data.title} | The Construct`} description={post.data.excerpt}>
+<BaseLayout
+  title={`${title} | The Construct`}
+  description={post.data.excerpt}
+  type="article"
+  image={post.data.coverImage}
+  publishedAt={post.data.publishedAt}
+  updatedAt={post.data.updatedAt}
+  jsonLd={jsonLd}
+>
   <main class="min-h-screen px-6 pt-28 pb-16">
     <article class="mx-auto max-w-3xl">
       <a class="text-sm text-primary underline underline-offset-4" href={`${base}blog/`}>← All posts</a>
@@ -38,6 +70,7 @@ const formatDate = (date: Date) => new Intl.DateTimeFormat('en', { dateStyle: 'l
         </div>
       </header>
       <div class="content-prose mt-10"><Content /></div>
+      <RelatedContent heading="Related articles" entries={relatedPosts} />
     </article>
   </main>
 </BaseLayout>

@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { access, readFile } from 'node:fs/promises';
+import { access, readFile, readdir } from 'node:fs/promises';
 import { resolve } from 'node:path';
 
 const dist = resolve('dist');
@@ -25,3 +25,11 @@ assert.match(home, /href="\/blog\//);
 assert.match(home, /href="\/architect\//);
 
 await access(resolve('src/pages/blog/tags/[tag].astro'));
+
+const portfolioDirectories = await readdir(resolve(dist, 'portfolio'), { withFileTypes: true });
+const firstProject = portfolioDirectories.find((entry) => entry.isDirectory());
+assert.ok(firstProject, 'Expected at least one generated portfolio project');
+const project = await readFile(resolve(dist, 'portfolio', firstProject.name, 'index.html'), 'utf8');
+assert.match(project, /"@type":"CreativeWork"/);
+assert.match(project, /<link rel="canonical" href="https:\/\/theconstruct\.ing\/portfolio\//);
+assert.doesNotMatch(project, /hciupinski\.github\.io/);
