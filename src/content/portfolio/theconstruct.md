@@ -1,6 +1,6 @@
 ---
 title: The Construct
-summary: Statyczne portfolio i blog, w których treści są wersjonowane jako Markdown i automatycznie publikowane na GitHub Pages.
+summary: A static portfolio and blog whose Markdown content is versioned with the code and automatically published to GitHub Pages.
 techStack:
   - Astro
   - TypeScript
@@ -15,6 +15,6 @@ links:
 draft: false
 ---
 
-The Construct to osobista strona portfolio połączona z blogiem. Projekt stawia na prosty, trwały proces publikacji: wpisy i opisy projektów powstają w Markdownzie, są wersjonowane razem z kodem i trafiają na stronę po scaleniu zmian do głównej gałęzi.
+The Construct is a personal portfolio and blog. It uses a simple, durable publishing workflow: posts and project descriptions are authored in Markdown, versioned alongside the code, and published after changes are merged into the main branch.
 
-Astro odpowiada za lekką, statycznie generowaną warstwę prezentacyjną, a GitHub Actions automatyzuje kontrolę jakości, build i wdrożenie. To przykład świadomego połączenia content-driven development z prostym, bezobsługowym hostingiem.
+Astro provides a lightweight, statically generated presentation layer, while GitHub Actions automates quality checks, builds, and deployment. It is a deliberate combination of content-driven development and simple, low-maintenance hosting.

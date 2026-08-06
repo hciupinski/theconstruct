@@ -1,6 +1,6 @@
 ---
 title: Budget App
-summary: Local-first aplikacja do planowania budżetu, realizacji miesięcznych działań oraz śledzenia kont i inwestycji.
+summary: A local-first application for budget planning, monthly execution, and tracking accounts and investments.
 techStack:
   - Next.js
   - ASP.NET Core
@@ -14,6 +14,6 @@ links:
 draft: false
 ---
 
-Budget App to aplikacja typu local-first, zaprojektowana do zarządzania domowym budżetem z bezpiecznym dostępem właściciela. Łączy roczny plan finansowy z miesięcznym obszarem realizacji, dzięki czemu zaplanowane kwoty można konsekwentnie przekładać na faktyczne działania i wyniki.
+Budget App is a local-first application for managing a household budget with secure owner access. It connects an annual financial plan to a monthly execution workspace, helping planned amounts translate consistently into actions and outcomes.
 
-System składa się z interfejsu Next.js, API w ASP.NET Core z uwierzytelnianiem JWT, workera tła i bazy PostgreSQL, uruchamianych wspólnie przez Docker Compose. Oprócz budżetowania obsługuje konta bankowe, oszczędności, rachunki brokerskie, transfery, migawki planowanych i rzeczywistych sald, portfel inwestycyjny oraz cele oszczędnościowe. Panel audytu pozwala śledzić ostatnie zmiany w danych.
+The system combines a Next.js interface, an ASP.NET Core API with JWT authentication, a background worker, and PostgreSQL, all running through Docker Compose. Beyond budgeting, it supports bank, savings, brokerage, and cash accounts; transfers; planned-versus-actual balance snapshots; an investment portfolio; and savings goals. An audit panel makes recent data changes traceable.

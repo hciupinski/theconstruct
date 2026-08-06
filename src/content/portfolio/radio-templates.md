@@ -1,6 +1,6 @@
 ---
-title: Atlas opisów radiologicznych
-summary: Aplikacja PWA do tworzenia, wyszukiwania i eksportowania wersjonowanych szablonów opisów radiologicznych.
+title: Radiology Reporting Template Atlas
+summary: A PWA for creating, searching, and exporting versioned radiology reporting templates.
 techStack:
   - TypeScript
   - Vite
@@ -13,8 +13,8 @@ links:
 draft: false
 ---
 
-Atlas opisów radiologicznych jest statyczną aplikacją ułatwiającą utrzymywanie spójnych szablonów opisów badań. MVP skupia się na USG, ale model danych obejmuje także CT, MR, RTG, MMG, DXA i inne modalności.
+Radiology Reporting Template Atlas is a static application for maintaining consistent examination-reporting templates. The MVP focuses on ultrasound, while its data model also supports CT, MRI, X-ray, mammography, DXA, and other modalities.
 
-Treści są przechowywane jako czytelne pliki YAML: osobno definiowane są szablony, słowniki pojęć i katalog źródeł. Proces builda waliduje dane oraz generuje manifest i wersjonowany bundle dostępny również offline. Każdy szablon może obejmować listę elementów do oceny, opis, wnioski oraz opcjonalne uwagi kliniczne, diagnostykę różnicową i zalecenia. Aplikacja umożliwia też eksport gotowego zestawu do PDF.
+Content is kept in readable YAML files: templates, shared terminology, and a source catalogue are defined separately. The build process validates the data and generates a manifest plus a versioned bundle available offline. Each template can include an assessment checklist, report text, impression, and optional clinical notes, differential diagnosis, and follow-up guidance. The application can also export the finished collection to PDF.
 
-Projekt ma charakter edukacyjno-organizacyjny i nie zastępuje lokalnych standardów pracowni ani oceny klinicznej.
+The project is an educational and organizational tool; it does not replace local departmental standards or clinical judgement.

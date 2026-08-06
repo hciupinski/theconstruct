@@ -1,6 +1,6 @@
 ---
 title: ResistanceStack
-summary: Narzędzie CLI do audytu, wzmacniania i monitorowania bezpieczeństwa istniejących aplikacji na VPS.
+summary: A CLI for auditing, hardening, and monitoring the security of existing applications hosted on VPS infrastructure.
 techStack:
   - Go
   - SSH
@@ -14,6 +14,6 @@ links:
 draft: false
 ---
 
-ResistanceStack pomaga małym zespołom bezpiecznie uporządkować środowisko produkcyjne bez przebudowy istniejącego procesu wdrożeń. Jest skierowany do aplikacji już działających na jednym lub kilku serwerach VPS, gdzie liczą się szybka diagnoza, konkretne rekomendacje i minimalna ingerencja w system.
+ResistanceStack helps small teams safely improve production environments without rebuilding their existing deployment process. It is designed for applications already running on one or more VPS hosts, where fast diagnosis, actionable recommendations, and minimal system intrusion matter.
 
-CLI najpierw inwentaryzuje host i repozytorium, a następnie wykonuje audyt oraz proponuje priorytetowe działania. Moduły można uruchamiać niezależnie: hardening SSH, UFW, fail2ban i aktualizacji bezpieczeństwa; obserwowalność sygnałów runtime i bezpieczeństwa; a także generowanie workflowów GitHub Actions do skanowania zależności, kontenerów, SBOM i sekretów. Projekt zawiera tryby dry-run oraz rollback ostatniej zmiany na hoście.
+The CLI first inventories the host and repository, then audits them and prioritizes next actions. Its modules can be run independently: hardening SSH, UFW, fail2ban, and security updates; observing runtime and security signals; and generating GitHub Actions workflows for dependency, container, SBOM, and secret scanning. The project also includes dry-run modes and rollback for the latest host change.
