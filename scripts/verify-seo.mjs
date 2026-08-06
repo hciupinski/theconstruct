@@ -13,4 +13,9 @@ assert.equal(robots.trim(), 'User-agent: *\nAllow: /\nSitemap: https://theconstr
 
 const home = await readFile(resolve(dist, 'index.html'), 'utf8');
 
+assert.match(home, /<meta property="og:url" content="https:\/\/theconstruct\.ing\/"/);
+assert.match(home, /<meta name="twitter:card" content="summary_large_image"/);
+assert.match(home, /"@type":"WebSite"/);
+assert.match(home, /"@type":"Person"/);
 assert.match(home, /<link rel="canonical" href="https:\/\/theconstruct\.ing\/"/);
+assert.doesNotMatch(home, /hciupinski\.github\.io/);

@@ -15,4 +15,4 @@ export const site = {
 
 export const absoluteUrl = (path: string) => new URL(path, `${site.origin}/`).toString();
 
-export const absoluteImageUrl = (path = site.defaultImage) => absoluteUrl(path);
+export const absoluteImageUrl = (path: string = site.defaultImage) => absoluteUrl(path);

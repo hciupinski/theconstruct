@@ -1,25 +1,13 @@
 ---
 import MatrixConstructScene from '../components/MatrixConstructScene';
 import HomeLinks from '../components/HomeLinks.astro';
-import Navigation from '../components/Navigation.astro';
-import '../styles/index.css';
-
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { site } from '../config/site';
 ---
 
-<!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="description" content="Software architecture, security, and engineering notes." />
-    <link rel="canonical" href="https://hciupinski.github.io/theconstruct/" />
-    <title>The Construct — Software, Architecture, Security</title>
-  </head>
-  <body>
-    <Navigation />
-    <main class="h-screen w-screen overflow-hidden">
-      <MatrixConstructScene client:load />
-    </main>
-    <HomeLinks />
-  </body>
-</html>
+<BaseLayout title={site.defaultTitle} description={site.defaultDescription}>
+  <main class="h-screen w-screen overflow-hidden">
+    <MatrixConstructScene client:load />
+  </main>
+  <HomeLinks />
+</BaseLayout>
