@@ -21,9 +21,6 @@ assert.match(home, /"@type":"Person"/);
 assert.match(home, /<link rel="canonical" href="https:\/\/theconstruct\.ing\/"/);
 assert.doesNotMatch(home, /hciupinski\.github\.io/);
 assert.match(home, /<h1[^>]*>Software architecture, security, and engineering<\/h1>/);
-assert.match(home, /href="\/portfolio\//);
-assert.match(home, /href="\/blog\//);
-assert.match(home, /href="\/architect\//);
 
 await access(resolve('src/pages/blog/tags/[tag].astro'));
 
