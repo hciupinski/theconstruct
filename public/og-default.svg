@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630" role="img" aria-labelledby="title description">
+  <title id="title">The Construct</title>
+  <desc id="description">Software, architecture, and security by Hubert Ciupinski.</desc>
+  <rect width="1200" height="630" fill="#111111" />
+  <path d="M0 470 450 20h190L0 660zm510 120L1110 0h90L600 600z" fill="#242424" />
+  <rect x="96" y="96" width="16" height="342" fill="#ffffff" />
+  <text x="152" y="245" fill="#ffffff" font-family="Arial, Helvetica, sans-serif" font-size="100" font-weight="700">The Construct</text>
+  <text x="158" y="326" fill="#c9c9c9" font-family="Arial, Helvetica, sans-serif" font-size="36" letter-spacing="3">SOFTWARE · ARCHITECTURE · SECURITY</text>
+  <text x="158" y="500" fill="#ffffff" font-family="Arial, Helvetica, sans-serif" font-size="28">theconstruct.ing</text>
+</svg>

@@ -1,25 +1,27 @@
 ---
 import MatrixConstructScene from '../components/MatrixConstructScene';
 import HomeLinks from '../components/HomeLinks.astro';
-import Navigation from '../components/Navigation.astro';
-import '../styles/index.css';
-
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { site } from '../config/site';
 ---
 
-<!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="description" content="Software architecture, security, and engineering notes." />
-    <link rel="canonical" href="https://hciupinski.github.io/theconstruct/" />
-    <title>The Construct — Software, Architecture, Security</title>
-  </head>
-  <body>
-    <Navigation />
-    <main class="h-screen w-screen overflow-hidden">
-      <MatrixConstructScene client:load />
-    </main>
-    <HomeLinks />
-  </body>
-</html>
+<BaseLayout title={site.defaultTitle} description={site.defaultDescription}>
+  <main class="relative h-screen w-screen overflow-hidden">
+    <MatrixConstructScene client:load />
+    <section class="absolute inset-x-0 bottom-24 z-[1] px-6 md:bottom-12 md:px-10" aria-label="Site introduction">
+      <div class="max-w-2xl rounded-xl border border-gray-200 bg-white/90 p-6 shadow-lg backdrop-blur-sm md:p-8">
+        <p class="text-sm font-medium uppercase tracking-[0.2em] text-muted-foreground">The Construct</p>
+        <h1 class="mt-3 text-3xl leading-tight text-foreground md:text-5xl">Software architecture, security, and engineering</h1>
+        <p class="mt-4 max-w-xl text-base leading-7 text-muted-foreground md:text-lg">
+          I build durable software systems and document the decisions behind them.
+        </p>
+        <nav class="mt-6 flex flex-wrap gap-x-5 gap-y-3 text-sm font-medium" aria-label="Explore The Construct">
+          <a class="text-primary underline underline-offset-4" href="/architect/">Explore the architect profile</a>
+          <a class="text-primary underline underline-offset-4" href="/portfolio/">View selected projects</a>
+          <a class="text-primary underline underline-offset-4" href="/blog/">Read engineering notes</a>
+        </nav>
+      </div>
+    </section>
+  </main>
+  <HomeLinks />
+</BaseLayout>

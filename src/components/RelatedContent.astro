@@ -1,0 +1,30 @@
+---
+type Entry = {
+  title: string;
+  href: string;
+  description: string;
+};
+
+type Props = {
+  heading: string;
+  entries: Entry[];
+};
+
+const { heading, entries } = Astro.props;
+---
+
+{
+  entries.length > 0 && (
+    <aside class="mt-10 border-t border-border pt-6" aria-label={heading}>
+      <h2 class="text-lg">{heading}</h2>
+      <ul class="mt-4 space-y-3">
+        {entries.map((entry) => (
+          <li>
+            <a class="font-medium text-primary underline underline-offset-4" href={entry.href}>{entry.title}</a>
+            <p class="mt-1 text-sm text-muted-foreground">{entry.description}</p>
+          </li>
+        ))}
+      </ul>
+    </aside>
+  )
+}
