@@ -10,7 +10,8 @@
     "build": "astro check && astro build",
     "check": "astro check",
     "dev": "astro dev",
-    "preview": "astro preview"
+    "preview": "astro preview",
+    "verify:seo": "node scripts/verify-seo.mjs"
   },
   "dependencies": {
     "@astrojs/react": "^4.3.0",

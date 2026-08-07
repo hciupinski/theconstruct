@@ -69,6 +69,13 @@
   }
 }
 
+@media (prefers-reduced-motion: reduce) {
+  .matrix-shelf,
+  .matrix-cards {
+    animation: none;
+  }
+}
+
 @keyframes shelfMove {
   0% {
     transform: translate3d(var(--x), var(--y), calc(var(--z) - var(--travel))) scale(0.65);
