@@ -65,31 +65,3 @@ Longer project description in Markdown.
 ```
 
 `links` jest listą obiektów z polami `label` i pełnym adresem `href`.
-
-## Publikacja
-
-Workflow GitHub Actions waliduje pull requesty i po pushu do `main` buduje oraz
-publikuje katalog `dist` na GitHub Pages. Jednorazowo w ustawieniach repozytorium
-wybierz **Settings → Pages → Source: GitHub Actions**.
-
-GitHub Pages jest wyłącznie hostingiem. W **Settings → Pages** ustaw Custom
-domain na `theconstruct.ing` i skonfiguruj DNS zgodnie z instrukcją GitHub
-Pages dla własnej domeny. Canonicale, sitemap, RSS i grafiki do udostępniania
-muszą wskazywać wyłącznie `https://theconstruct.ing`.
-
-Sitemap jest generowany podczas buildu pod
-`https://theconstruct.ing/sitemap-index.xml`, a kanał RSS jest dostępny pod
-`https://theconstruct.ing/rss.xml`.
-
-## SEO po publikacji
-
-Po potwierdzeniu własności domeny dodaj sitemapę
-`https://theconstruct.ing/sitemap-index.xml` w Google Search Console oraz Bing
-Webmaster Tools. Następnie użyj inspekcji adresu URL dla strony głównej i
-jednego projektu, aby potwierdzić canonicale oraz indeksowanie.
-
-Przed publikacją nowego wpisu blogowego upewnij się, że jest po angielsku, ma
-unikalny tytuł i zwięzły excerpt, jednoznaczną strukturę nagłówków, linki do
-powiązanych projektów lub wpisów oraz opcjonalny obraz `coverImage`, gdy
-pomaga on czytelnikowi. Ustaw `draft: false` dopiero, gdy wpis jest gotowy do
-indeksowania.
