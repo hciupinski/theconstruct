@@ -1,86 +1,67 @@
 {
-  "$ref": "#/definitions/portfolio",
-  "definitions": {
-    "portfolio": {
-      "type": "object",
-      "properties": {
-        "title": {
-          "type": "string",
-          "minLength": 1
-        },
-        "summary": {
-          "type": "string",
-          "minLength": 1
-        },
-        "techStack": {
-          "type": "array",
-          "items": {
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "title": {
+      "type": "string",
+      "minLength": 1
+    },
+    "summary": {
+      "type": "string",
+      "minLength": 1
+    },
+    "techStack": {
+      "minItems": 1,
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "links": {
+      "minItems": 1,
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "label": {
             "type": "string",
             "minLength": 1
           },
-          "minItems": 1
+          "href": {
+            "type": "string",
+            "format": "uri"
+          }
         },
-        "links": {
-          "type": "array",
-          "items": {
-            "type": "object",
-            "properties": {
-              "label": {
-                "type": "string",
-                "minLength": 1
-              },
-              "href": {
-                "type": "string",
-                "format": "uri"
-              }
-            },
-            "required": [
-              "label",
-              "href"
-            ],
-            "additionalProperties": false
-          },
-          "minItems": 1
-        },
-        "seoTitle": {
-          "type": "string",
-          "minLength": 1
-        },
-        "coverImage": {
-          "type": "string"
-        },
-        "updatedAt": {
-          "anyOf": [
-            {
-              "type": "string",
-              "format": "date-time"
-            },
-            {
-              "type": "string",
-              "format": "date"
-            },
-            {
-              "type": "integer",
-              "format": "unix-time"
-            }
-          ]
-        },
-        "draft": {
-          "type": "boolean",
-          "default": false
-        },
-        "$schema": {
-          "type": "string"
-        }
-      },
-      "required": [
-        "title",
-        "summary",
-        "techStack",
-        "links"
-      ],
-      "additionalProperties": false
+        "required": [
+          "label",
+          "href"
+        ]
+      }
+    },
+    "seoTitle": {
+      "type": "string",
+      "minLength": 1
+    },
+    "coverImage": {
+      "type": "string"
+    },
+    "updatedAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "draft": {
+      "default": false,
+      "type": "boolean"
+    },
+    "$schema": {
+      "type": "string"
     }
   },
-  "$schema": "http://json-schema.org/draft-07/schema#"
+  "required": [
+    "title",
+    "summary",
+    "techStack",
+    "links"
+  ]
 }
