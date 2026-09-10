@@ -6,18 +6,18 @@ repozytorium jako Markdown — publikacja następuje po mergu commita do `main`.
 
 ## Lokalny rozwój
 
-Wymagany jest Node.js 22.13+ oraz pnpm 11+.
+Wymagany jest Bun 1.4+ oraz Node.js 22.13+.
 
 ```sh
-pnpm install
-pnpm dev
+bun install
+bun run dev
 ```
 
 Przed wysłaniem zmian uruchom:
 
 ```sh
-pnpm check
-pnpm build
+bun run check
+bun run build
 ```
 
 ## Dodawanie wpisu na blogu
